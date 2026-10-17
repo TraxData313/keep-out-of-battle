@@ -13,9 +13,9 @@ The option's label shows how many are kept out, and its tooltip names them.
 At the start of a battle a green line in the log names who was kept out.
 
 **On the Order of Battle screen** (land battles) there is also a **Keep out of battle** button under the
-hero pool at the top. It opens the same list. Heroes you tick there leave the field at once, unhurt, and
-stay out of later battles too. Unticking a hero who is already off the field brings them back from the
-next battle on (they can't be put back into this one).
+hero pool at the top. It opens the same list. Heroes you tick there step out of the line at once (hidden and
+taken off the hero lists) and leave the field, unhurt, when you press Ready. Untick them before Ready and they
+are back in the line and the hero pool. Either way the choice is remembered for later battles.
 
 ## What "kept out" means
 
@@ -53,10 +53,12 @@ A postfix on the `PartyGroupTroopSupplier` constructor lowers its initial troop 
 out, so "troops not supplied yet" stays correct.
 
 The Order of Battle button is a UIExtenderEx prefab insert after the `CaptainPool` panel of the
-`OrderOfBattle` movie, with a view-model mixin on the campaign's `SPOrderOfBattleVM`. Taking a hero off the
-field: clear their hero item from the Order of Battle's lists (`ClearHeroAssignment`, `_allHeroes`,
-`UnassignedHeroes`), book the agent's origin as an ordered withdrawal (`SetRouted(isOrderRetreat: true)`:
-back to the party unhurt, never sent in again as a reinforcement), then `FadeOut` the agent and its mount.
+`OrderOfBattle` movie, with a view-model mixin on the campaign's `SPOrderOfBattleVM`. Ticking a hero there
+clears their hero item from the Order of Battle's lists (`ClearHeroAssignment`, `_allHeroes`,
+`UnassignedHeroes`) and hides the agent and mount (`AgentVisuals.SetVisible(false)`); a `KeepOutMissionLogic`
+keeps them pending, and unticking puts the item and the visuals back. At `OnDeploymentFinished` each pending
+agent's origin is booked as an ordered withdrawal (`SetRouted(isOrderRetreat: true)`: back to the party
+unhurt, never sent in again as a reinforcement), then the agent and its mount are faded out.
 The naval Order of Battle is a different screen and has no button; use the encounter menu there.
 
 The popup is the game's own multi-selection inquiry. A postfix on `MultiSelectionQueryPopUpVM.SetData`

@@ -63,6 +63,14 @@ namespace KeepOutOfBattle
             }
         }
 
+        public override void OnBeforeMissionBehaviorInitialize(Mission mission)
+        {
+            base.OnBeforeMissionBehaviorInitialize(mission);
+            // Only campaign battles have a hero choice to make (the Order of Battle button needs this logic).
+            if (KeptOutBehavior.Instance != null && TaleWorlds.CampaignSystem.MapEvents.MapEvent.PlayerMapEvent != null)
+                mission.AddMissionBehavior(new KeepOutMissionLogic());
+        }
+
         internal static void Warn(string message)
         {
             Debug.Print("[KeepOutOfBattle] " + message);

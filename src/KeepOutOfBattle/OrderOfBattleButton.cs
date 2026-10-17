@@ -45,8 +45,8 @@ namespace KeepOutOfBattle
         [DataSourceProperty] public string KeepOutOfBattleText => "Keep out of battle";
 
         [DataSourceProperty] public HintViewModel KeepOutOfBattleHint { get; } = new HintViewModel(new TextObject("{=!}"
-            + "Choose companions, your surgeon or family who should stay out of the fighting. They leave the field now, unhurt, "
-            + "and stay out of every later battle until you untick them."));
+            + "Choose companions, your surgeon or family who should stay out of the fighting. They step out of the line now "
+            + "and leave the field, unhurt, when you press Ready, and stay out of every later battle until you untick them."));
 
         [DataSourceMethod]
         public void ExecuteKeepOutOfBattle()
@@ -63,6 +63,8 @@ namespace KeepOutOfBattle
         }
     }
 
+    // Ticking a hero on the Order of Battle screen only HIDES them (off the hero lists, invisible on the field), so
+    // unticking before "Ready" puts them back. They leave the field for real when deployment ends.
     internal static class OrderOfBattleKeepOut
     {
         private static readonly AccessTools.FieldRef<OrderOfBattleVM, List<OrderOfBattleHeroItemVM>> AllHeroes =
@@ -76,11 +78,12 @@ namespace KeepOutOfBattle
         {
             var behavior = KeptOutBehavior.Instance;
             var mission = Mission.Current;
-            if (behavior == null || mission?.PlayerTeam == null)
+            var logic = mission?.GetMissionBehavior<KeepOutMissionLogic>();
+            if (behavior == null || mission?.PlayerTeam == null || logic == null)
                 return;
 
             var onField = PartyHeroAgents(mission);
-            // Everyone on the field, then those already kept out of it, who are shown ticked.
+            // Everyone on the field (the hidden ones too), then those kept out of it from the start, shown ticked.
             var heroes = onField.Keys.ToList();
             heroes.AddRange(KeptOutBehavior.PartyHeroes().Where(h => behavior.IsKeptOut(h) && !onField.ContainsKey(h)));
             if (heroes.Count == 0)
@@ -90,23 +93,40 @@ namespace KeepOutOfBattle
             }
 
             behavior.ShowPicker(heroes,
-                "Ticked heroes leave the field now, unhurt, and stay out of every later battle until you untick them. "
-                + "They still share your party's fate if the battle is lost.",
+                "Ticked heroes step out of the line now and leave the field, unhurt, when you press Ready; untick them before "
+                + "then to bring them back. They stay out of every later battle until you untick them, and still share your "
+                + "party's fate if the battle is lost.",
                 ticked =>
                 {
-                    var leaving = ticked.Where(onField.ContainsKey).ToList();
-                    foreach (var hero in leaving)
-                        TakeOffTheField(vm, onField[hero], hero);
-                    if (leaving.Count > 0)
+                    var hidden = new List<Hero>();
+                    var restored = new List<Hero>();
+                    foreach (var pair in onField)
+                    {
+                        bool wantOut = ticked.Contains(pair.Key);
+                        if (wantOut && !logic.IsPending(pair.Value))
+                        {
+                            logic.Hide(pair.Value, pair.Key, RemoveFromLists(vm, pair.Value));
+                            hidden.Add(pair.Key);
+                        }
+                        else if (!wantOut && logic.IsPending(pair.Value))
+                        {
+                            RestoreToLists(vm, logic.Restore(pair.Value));
+                            restored.Add(pair.Key);
+                        }
+                    }
+                    if (hidden.Count > 0)
                         InformationManager.DisplayMessage(new InformationMessage(
-                            "Kept out of battle: " + string.Join(", ", leaving.Select(h => h.Name.ToString())) + ".", Color.FromUint(0xFF9FD3A6)));
+                            "Kept out of battle: " + Names(hidden) + ".", Color.FromUint(0xFF9FD3A6)));
+                    if (restored.Count > 0)
+                        InformationManager.DisplayMessage(new InformationMessage(Names(restored) + " will fight in this battle."));
 
                     var backLater = heroes.Where(h => !onField.ContainsKey(h) && !ticked.Contains(h)).ToList();
                     if (backLater.Count > 0)
-                        InformationManager.DisplayMessage(new InformationMessage(
-                            string.Join(", ", backLater.Select(h => h.Name.ToString())) + " will fight again from the next battle."));
+                        InformationManager.DisplayMessage(new InformationMessage(Names(backLater) + " will fight again from the next battle."));
                 });
         }
+
+        private static string Names(IEnumerable<Hero> heroes) => string.Join(", ", heroes.Select(h => h.Name.ToString()));
 
         // The player's own party's heroes standing in this battle, the player excepted.
         private static Dictionary<Hero, Agent> PartyHeroAgents(Mission mission)
@@ -125,10 +145,9 @@ namespace KeepOutOfBattle
             return result;
         }
 
-        // Out of the Order of Battle's lists first (it holds the agent in its hero items), then off the field. The
-        // mission books an agent that leaves this way like one that withdrew in good order: back in the party, unhurt,
-        // and never sent in again as a reinforcement.
-        private static void TakeOffTheField(OrderOfBattleVM vm, Agent agent, Hero hero)
+        // The Order of Battle holds the agent in a hero item (in the pool, or as a captain / hero troop of a
+        // formation). Out of every list, so it can't be assigned while hidden; returned to put it back.
+        private static OrderOfBattleHeroItemVM? RemoveFromLists(OrderOfBattleVM vm, Agent agent)
         {
             try
             {
@@ -143,19 +162,98 @@ namespace KeepOutOfBattle
                     if (vm.LastSelectedHeroItem == item)
                         vm.LastSelectedHeroItem = null;
                 }
+                return item;
             }
             catch (Exception e)
             {
                 SubModule.LogOnce("Order of Battle hero list update", e);
+                return null;
             }
+        }
 
+        private static void RestoreToLists(OrderOfBattleVM vm, OrderOfBattleHeroItemVM? item)
+        {
+            if (item == null)
+                return;
+            try
+            {
+                var items = AllHeroes(vm);
+                if (!items.Contains(item))
+                    items.Add(item);
+                if (vm.UnassignedHeroes != null && !vm.UnassignedHeroes.Contains(item))
+                    vm.UnassignedHeroes.Add(item);
+            }
+            catch (Exception e)
+            {
+                SubModule.LogOnce("Order of Battle hero list restore", e);
+            }
+        }
+    }
+
+    // Holds the heroes hidden on the Order of Battle screen and takes them off the field when deployment ends.
+    internal sealed class KeepOutMissionLogic : MissionLogic
+    {
+        private readonly Dictionary<Agent, (Hero Hero, OrderOfBattleHeroItemVM? Item)> _pending =
+            new Dictionary<Agent, (Hero Hero, OrderOfBattleHeroItemVM? Item)>();
+
+        public bool IsPending(Agent agent) => _pending.ContainsKey(agent);
+
+        public void Hide(Agent agent, Hero hero, OrderOfBattleHeroItemVM? item)
+        {
+            _pending[agent] = (hero, item);
+            SetVisible(agent, false);
+        }
+
+        public OrderOfBattleHeroItemVM? Restore(Agent agent)
+        {
+            if (!_pending.TryGetValue(agent, out var entry))
+                return null;
+            _pending.Remove(agent);
+            SetVisible(agent, true);
+            return entry.Item;
+        }
+
+        public override void OnDeploymentFinished()
+        {
+            base.OnDeploymentFinished();
+            foreach (var pair in _pending.ToList())
+            {
+                try
+                {
+                    TakeOffTheField(pair.Key, pair.Value.Hero);
+                }
+                catch (Exception e)
+                {
+                    SubModule.LogOnce("taking a hero off the field", e);
+                }
+            }
+            _pending.Clear();
+        }
+
+        // Booked first and explicitly as an ordered withdrawal (not a rout): back in the party, unhurt, and never
+        // sent in again as a reinforcement. The removal the fade-out reports afterwards finds the origin settled.
+        private static void TakeOffTheField(Agent agent, Hero hero)
+        {
+            if (!agent.IsActive())
+                return;
             if (agent.Formation?.Captain == agent)
                 agent.Formation.Captain = null;
-            // Booked first and explicitly as an ordered withdrawal (not a rout): the hero goes back to the party
-            // whole. The removal the fade-out reports afterwards finds the origin already settled.
             agent.Origin?.SetRouted(isOrderRetreat: true);
             agent.FadeOut(hideInstantly: true, hideMount: true);
             ReadyListPatch.MarkKeptOut(MapEvent.PlayerMapEvent, hero.StringId);
+        }
+
+        private static void SetVisible(Agent agent, bool visible)
+        {
+            try
+            {
+                agent.AgentVisuals?.SetVisible(visible);
+                agent.MountAgent?.AgentVisuals?.SetVisible(visible);
+            }
+            catch (Exception e)
+            {
+                SubModule.LogOnce("hiding a hero on the field", e);
+            }
         }
     }
 }
