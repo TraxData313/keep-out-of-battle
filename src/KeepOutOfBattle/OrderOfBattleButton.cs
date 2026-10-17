@@ -213,9 +213,31 @@ namespace KeepOutOfBattle
             return entry.Item;
         }
 
+        // NOT in OnDeploymentFinished: right after it the mission's OnAfterDeploymentFinished walks Mission.Agents and
+        // sets up every agent's stats and equipment in native code. An agent faded out a moment earlier is still in
+        // that list but gone in the engine, and the game crashed with an access violation (playtest, 2026-10-17).
+        // So the hidden heroes leave a couple of ticks after deployment has fully ended.
+        private int _ticksUntilRemoval = -1;
+
         public override void OnDeploymentFinished()
         {
             base.OnDeploymentFinished();
+            if (_pending.Count > 0)
+                _ticksUntilRemoval = 2;
+        }
+
+        public override void OnMissionTick(float dt)
+        {
+            base.OnMissionTick(dt);
+            if (_ticksUntilRemoval < 0 || !Mission.IsDeploymentFinished)
+                return;
+            if (_ticksUntilRemoval-- > 0)
+                return;
+            RemovePending();
+        }
+
+        private void RemovePending()
+        {
             foreach (var pair in _pending.ToList())
             {
                 try
@@ -239,6 +261,8 @@ namespace KeepOutOfBattle
             if (agent.Formation?.Captain == agent)
                 agent.Formation.Captain = null;
             agent.Origin?.SetRouted(isOrderRetreat: true);
+            // Visuals back on first, so the engine fades out an agent in the state it always sees one in.
+            SetVisible(agent, true);
             agent.FadeOut(hideInstantly: true, hideMount: true);
             ReadyListPatch.MarkKeptOut(MapEvent.PlayerMapEvent, hero.StringId);
         }
