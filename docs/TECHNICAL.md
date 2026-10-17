@@ -12,6 +12,11 @@ The option's label shows how many are kept out, and its tooltip names them.
 
 At the start of a battle a green line in the log names who was kept out.
 
+**On the Order of Battle screen** (land battles) there is also a **Keep out of battle** button under the
+hero pool at the top. It opens the same list. Heroes you tick there leave the field at once, unhurt, and
+stay out of later battles too. Unticking a hero who is already off the field brings them back from the
+next battle on (they can't be put back into this one).
+
 ## What "kept out" means
 
 - **Field, siege and naval battles:** the hero is not spawned and not brought in as a reinforcement.
@@ -47,13 +52,20 @@ reads it first and hands it to the postfix; heroes in it are never taken out.
 A postfix on the `PartyGroupTroopSupplier` constructor lowers its initial troop count by the number taken
 out, so "troops not supplied yet" stays correct.
 
+The Order of Battle button is a UIExtenderEx prefab insert after the `CaptainPool` panel of the
+`OrderOfBattle` movie, with a view-model mixin on the campaign's `SPOrderOfBattleVM`. Taking a hero off the
+field: clear their hero item from the Order of Battle's lists (`ClearHeroAssignment`, `_allHeroes`,
+`UnassignedHeroes`), book the agent's origin as an ordered withdrawal (`SetRouted(isOrderRetreat: true)`:
+back to the party unhurt, never sent in again as a reinforcement), then `FadeOut` the agent and its mount.
+The naval Order of Battle is a different screen and has no button; use the encounter menu there.
+
 The popup is the game's own multi-selection inquiry. A postfix on `MultiSelectionQueryPopUpVM.SetData`
 ticks the heroes already kept out when *our* popup opens (matched by reference). If that patch fails, the
 popup still works: kept-out heroes are marked "(kept out now)" in their name instead.
 
 ## Build
 
-Needs the .NET SDK. Paths are in `Directory.Build.props`; put yours in a git-ignored
+Needs the .NET SDK, Harmony and UIExtenderEx. Paths are in `Directory.Build.props`; put yours in a git-ignored
 `Directory.Build.props.user`.
 
 ```

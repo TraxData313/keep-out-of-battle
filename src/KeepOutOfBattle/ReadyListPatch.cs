@@ -151,6 +151,16 @@ namespace KeepOutOfBattle
 
         private static BattleRecord? RecordFor(MapEvent? mapEvent) => mapEvent == null ? null : Battles.GetOrCreateValue(mapEvent);
 
+        // A hero taken off the field from the Order of Battle screen.
+        public static void MarkKeptOut(MapEvent? mapEvent, string heroId)
+        {
+            var record = RecordFor(mapEvent);
+            if (record == null)
+                return;
+            record.KeptOut.Add(heroId);
+            record.Fought.Remove(heroId);
+        }
+
         public static bool WasKeptOut(MapEvent? mapEvent, string? heroId)
         {
             if (mapEvent == null || string.IsNullOrEmpty(heroId) || !Battles.TryGetValue(mapEvent, out var record))

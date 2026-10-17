@@ -1,4 +1,5 @@
 using System;
+using Bannerlord.UIExtenderEx;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
@@ -12,7 +13,24 @@ namespace KeepOutOfBattle
         internal const string HarmonyId = "trax.bannerlord.keepoutofbattle";
 
         private static bool _patched;
+        private static UIExtender? _uiExtender;
         private static readonly System.Collections.Generic.HashSet<string> Logged = new System.Collections.Generic.HashSet<string>();
+
+        protected override void OnSubModuleLoad()
+        {
+            base.OnSubModuleLoad();
+            try
+            {
+                _uiExtender = UIExtender.Create("KeepOutOfBattle");
+                _uiExtender.Register(typeof(SubModule).Assembly);
+                _uiExtender.Enable();
+            }
+            catch (Exception e)
+            {
+                // Costs only the Order of Battle button; the encounter-menu option still works.
+                Debug.Print("[KeepOutOfBattle] UIExtenderEx setup failed: " + e);
+            }
+        }
 
         // Patched on the first campaign start rather than in OnSubModuleLoad, so nothing the patched methods
         // touch is JIT-compiled (and its static constructors run) before a campaign exists.

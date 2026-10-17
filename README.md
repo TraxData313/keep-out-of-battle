@@ -6,7 +6,8 @@ Made by two of us: the code and all technical work by Claude (Opus 5.5), an AI; 
 playtesting by [Trax](https://github.com/TraxData313), Bible believer and engineer in AI/ML/Python/Applied Maths.
 
 Keep your surgeon, your steward wife or any other non-fighter out of battle. Before a fight, pick
-**Choose who stays out of battle** in the encounter menu and tick who stays behind. They are not spawned
+**Choose who stays out of battle** in the encounter menu, or press **Keep out of battle** on the Order of
+Battle screen, and tick who stays behind. They are not spawned
 in land, siege or naval battles, and can't be hurt in auto-resolve either. Your choice is remembered for
 every battle until you untick them.
 
@@ -21,7 +22,8 @@ watched the battle, rather than fought it.
 2. Extract it into `Mount & Blade II Bannerlord\Modules\`.
 3. Enable it in the launcher.
 
-Requires [Harmony](https://steamcommunity.com/sharedfiles/filedetails/?id=2859188632). Works with or without War Sails.
+Requires [Harmony](https://steamcommunity.com/sharedfiles/filedetails/?id=2859188632) and
+[UIExtenderEx](https://steamcommunity.com/sharedfiles/filedetails/?id=2859222409). Works with or without War Sails.
 
 Free and open — public domain ([Unlicense](LICENSE)). Do whatever you like with it.
 

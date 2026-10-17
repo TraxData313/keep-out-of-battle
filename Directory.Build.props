@@ -7,6 +7,8 @@
     <GameFolder>D:\SteamLibrary\steamapps\common\Mount &amp; Blade II Bannerlord</GameFolder>
     <!-- Bannerlord.Harmony (Steam Workshop 2859188632): referenced but NOT shipped, its module provides 0Harmony.dll -->
     <HarmonyBinFolder>D:\SteamLibrary\steamapps\workshop\content\261550\2859188632\bin\Win64_Shipping_Client</HarmonyBinFolder>
+    <!-- Bannerlord.UIExtenderEx (Steam Workshop 2859222409): referenced but NOT shipped, same as Harmony -->
+    <UIExtenderExBinFolder>D:\SteamLibrary\steamapps\workshop\content\261550\2859222409\bin\Win64_Shipping_Client</UIExtenderExBinFolder>
     <!-- Copy the built module into $(GameFolder)\Modules\KeepOutOfBattle after each build -->
     <DeployToGame>true</DeployToGame>
   </PropertyGroup>

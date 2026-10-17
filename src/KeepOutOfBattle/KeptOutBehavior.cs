@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
@@ -69,7 +70,7 @@ namespace KeepOutOfBattle
         }
 
         // Heroes of the player's own party who could be sent in: everyone but the player.
-        private static List<Hero> PartyHeroes()
+        internal static List<Hero> PartyHeroes()
         {
             var party = MobileParty.MainParty;
             if (party?.MemberRoster == null)
@@ -99,7 +100,16 @@ namespace KeepOutOfBattle
 
         private void OptionConsequence(MenuCallbackArgs args)
         {
-            var heroes = PartyHeroes();
+            ShowPicker(PartyHeroes(),
+                "Ticked heroes stay behind in this and every later battle, on land and at sea, until you untick them. "
+                + "They still share your party's fate if the battle is lost.",
+                _ => Campaign.Current?.CurrentMenuContext?.Refresh());
+        }
+
+        // The game's own multi-selection popup over these heroes, the kept-out ones pre-ticked. On "Done" the
+        // choice is saved for every later battle, then onDone gets the heroes that were ticked.
+        internal void ShowPicker(List<Hero> heroes, string description, Action<List<Hero>> onDone)
+        {
             bool canPreselect = PopupPreselectPatch.IsActive;
             var elements = heroes.Select(h => new InquiryElement(
                 h,
@@ -110,9 +120,7 @@ namespace KeepOutOfBattle
 
             var data = new MultiSelectionInquiryData(
                 "Keep out of battle",
-                "Ticked heroes stay behind in this and every later battle, on land and at sea, until you untick them. "
-                + "They still share your party's fate if the battle is lost."
-                + (canPreselect ? "" : "\nTick everyone who should stay out; anyone left unticked will fight."),
+                description + (canPreselect ? "" : "\nTick everyone who should stay out; anyone left unticked will fight."),
                 elements,
                 isExitShown: true,
                 minSelectableOptionCount: 0,
@@ -121,8 +129,9 @@ namespace KeepOutOfBattle
                 negativeText: "Cancel",
                 affirmativeAction: chosen =>
                 {
-                    SetKeptOut(heroes, chosen.Select(e => e.Identifier).OfType<Hero>());
-                    Campaign.Current?.CurrentMenuContext?.Refresh();
+                    var ticked = chosen.Select(e => e.Identifier).OfType<Hero>().ToList();
+                    SetKeptOut(heroes, ticked);
+                    onDone(ticked);
                 },
                 negativeAction: null);
 
