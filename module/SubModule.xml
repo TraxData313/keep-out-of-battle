@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/BUTR/Bannerlord.XmlSchemas/master/SubModule.xsd">
+  <Id value="KeepOutOfBattle" />
+  <Name value="Keep Out of Battle" />
+  <Version value="v1.0.0" />
+  <DefaultModule value="false" />
+  <ModuleCategory value="Singleplayer" />
+  <ModuleType value="Community" />
+  <DependedModules>
+    <DependedModule Id="Bannerlord.Harmony" />
+    <DependedModule Id="Native" />
+    <DependedModule Id="SandBoxCore" />
+    <DependedModule Id="Sandbox" />
+  </DependedModules>
+  <DependedModuleMetadatas>
+    <DependedModuleMetadata id="Bannerlord.Harmony" order="LoadBeforeThis" />
+    <DependedModuleMetadata id="Native" order="LoadBeforeThis" />
+    <DependedModuleMetadata id="SandBoxCore" order="LoadBeforeThis" />
+    <DependedModuleMetadata id="Sandbox" order="LoadBeforeThis" />
+    <!-- War Sails: optional. Naval battles use the same troop supplier, so nothing naval-specific is
+         patched; loading after it only lets the option land in its storyline encounter menus too. -->
+    <DependedModuleMetadata id="NavalDLC" order="LoadBeforeThis" optional="true" />
+  </DependedModuleMetadatas>
+  <SubModules>
+    <SubModule>
+      <Name value="Keep Out of Battle" />
+      <DLLName value="KeepOutOfBattle.dll" />
+      <SubModuleClassType value="KeepOutOfBattle.SubModule" />
+      <Tags />
+    </SubModule>
+  </SubModules>
+</Module>

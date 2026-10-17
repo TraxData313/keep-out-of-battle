@@ -1,0 +1,14 @@
+bin/
+obj/
+*.user
+.vs/
+.idea/
+
+dist/
+
+# Droppings of TaleWorlds' Workshop uploader when run from the repo root
+steam_appid.txt
+steam_workshop_uploader.txt
+
+# Raw in-game screenshots (the cover is built from them; only docs/cover.jpg is committed)
+screenshots/

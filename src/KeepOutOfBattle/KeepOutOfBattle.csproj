@@ -1,0 +1,70 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <RootNamespace>KeepOutOfBattle</RootNamespace>
+    <AssemblyName>KeepOutOfBattle</AssemblyName>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <ModuleFolder>$(MSBuildThisFileDirectory)..\..\module</ModuleFolder>
+    <OutputPath>$(ModuleFolder)\bin\Win64_Shipping_Client\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Lets the .NET SDK build net472 without a Visual Studio targeting pack -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- Harmony and the game assemblies are referenced from the local install and never copied to output -->
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>$(HarmonyBinFolder)\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.CampaignSystem">
+      <HintPath>$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.CampaignSystem.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Core">
+      <HintPath>$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Core.ViewModelCollection">
+      <HintPath>$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.Core.ViewModelCollection.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Library">
+      <HintPath>$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.Library.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Localization">
+      <HintPath>$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.Localization.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade">
+      <HintPath>$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade.ViewModelCollection">
+      <HintPath>$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.MountAndBlade.ViewModelCollection.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.ObjectSystem">
+      <HintPath>$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.ObjectSystem.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.SaveSystem">
+      <HintPath>$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.SaveSystem.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Install: mirror module\ into the game's Modules\KeepOutOfBattle (that folder only) -->
+  <Target Name="DeployToGameModules" AfterTargets="Build" Condition="'$(DeployToGame)' == 'true' And Exists('$(GameFolder)\Modules')">
+    <ItemGroup>
+      <ModuleFiles Include="$(ModuleFolder)\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ModuleFiles)" DestinationFiles="@(ModuleFiles->'$(GameFolder)\Modules\KeepOutOfBattle\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Message Importance="high" Text="Deployed to $(GameFolder)\Modules\KeepOutOfBattle" />
+  </Target>
+
+</Project>
