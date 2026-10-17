@@ -10,5 +10,6 @@ dist/
 steam_appid.txt
 steam_workshop_uploader.txt
 
-# Raw in-game screenshots (the cover is built from them; only docs/cover.jpg is committed)
-screenshots/
+# Thumbnail build intermediates (the screenshots themselves live in docs/screenshots and are committed)
+/screenshots/
+/tools/build/

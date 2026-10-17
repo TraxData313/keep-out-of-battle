@@ -17,6 +17,9 @@ namespace KeepOutOfBattle
     {
         public static KeptOutBehavior? Instance { get; private set; }
 
+        /// <summary>Raised after the player changes who is kept out (the button's count listens).</summary>
+        public static event Action? Changed;
+
         private List<string> _keptOutIds = new List<string>();
         private HashSet<string> _keptOut = new HashSet<string>();
 
@@ -113,6 +116,14 @@ namespace KeepOutOfBattle
                 _keptOut.Remove(hero.StringId);
             foreach (var hero in chosen)
                 _keptOut.Add(hero.StringId);
+            try
+            {
+                Changed?.Invoke();
+            }
+            catch (Exception e)
+            {
+                SubModule.LogOnce("kept-out change notice", e);
+            }
         }
     }
 }

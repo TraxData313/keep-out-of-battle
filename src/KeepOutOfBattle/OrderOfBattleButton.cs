@@ -40,10 +40,30 @@ namespace KeepOutOfBattle
         public OrderOfBattleButtonMixin(SPOrderOfBattleVM vm) : base(vm)
         {
             OrderOfBattleKeepOut.Current = new WeakReference<OrderOfBattleVM>(vm);
+            KeptOutBehavior.Changed += OnKeptOutChanged;
         }
 
+        public override void OnFinalize()
+        {
+            KeptOutBehavior.Changed -= OnKeptOutChanged;
+            base.OnFinalize();
+        }
+
+        private void OnKeptOutChanged() => OnPropertyChanged(nameof(KeepOutOfBattleText));
+
         [DataSourceProperty] public bool IsKeepOutOfBattleVisible => KeptOutBehavior.Instance != null && MapEvent.PlayerMapEvent != null;
-        [DataSourceProperty] public string KeepOutOfBattleText => "Keep out of battle";
+
+        // "Keep out of battle (2)" while anyone of the party is kept out, so withheld heroes are never forgotten.
+        [DataSourceProperty]
+        public string KeepOutOfBattleText
+        {
+            get
+            {
+                var behavior = KeptOutBehavior.Instance;
+                int count = behavior == null ? 0 : KeptOutBehavior.PartyHeroes().Count(behavior.IsKeptOut);
+                return count == 0 ? "Keep out of battle" : "Keep out of battle (" + count + ")";
+            }
+        }
 
         [DataSourceProperty] public HintViewModel KeepOutOfBattleHint { get; } = new HintViewModel(new TextObject("{=!}"
             + "Choose companions, your surgeon or family who should stay out of the fighting. They step out of the line now "

@@ -6,7 +6,8 @@ For Bannerlord v1.4.8, with or without the War Sails DLC.
 
 On the Order of Battle screen of a land battle, a **Keep out of battle** button sits under the hero pool at
 the top. It opens a list of the heroes in your party with portraits; the tooltip on each says if they are
-your surgeon, quartermaster, scout, engineer or spouse. Heroes already kept out are shown ticked.
+your surgeon, quartermaster, scout, engineer or spouse. Heroes already kept out are shown ticked, and the
+button itself reads "Keep out of battle (2)" while two of your party are kept out.
 
 Ticking a hero there makes them step out of the line at once (hidden and taken off the hero lists); they
 leave the field, unhurt, when you press Ready. Untick them before Ready and they are back in the line and the
@@ -66,6 +67,11 @@ The naval Order of Battle is a different screen and has no button; choices made 
 The popup is the game's own multi-selection inquiry. A postfix on `MultiSelectionQueryPopUpVM.SetData`
 ticks the heroes already kept out when *our* popup opens (matched by reference). If that patch fails, the
 popup still works: kept-out heroes are marked "(kept out now)" in their name instead.
+
+## Thumbnail
+
+`python tools\make_thumbnail.py` builds `docs\thumbnail.jpg` (1024x1024, under 1 MB, for the Steam Workshop)
+from the two screenshots in `docs\screenshots\`, through `tools\preview_thumbnail.html` and headless Edge.
 
 ## Build
 

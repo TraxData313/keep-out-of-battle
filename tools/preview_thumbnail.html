@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<!-- Steam Workshop / mod thumbnail, 1024x1024: the Order of Battle field darkened behind, the "Keep out of battle"
+     popup (two heroes ticked) in front, the title below. Same house style as Better Skirmisher Separation
+     (gold frame, Palatino small caps over a dark fade). Rendered by: python tools\make_thumbnail.py -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1024px; height: 1024px; overflow: hidden; background: #0d0a07; }
+  .canvas {
+    position: relative;
+    width: 1024px; height: 1024px;
+    background: #0d0a07;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+  }
+  .field {
+    position: absolute; inset: 0;
+    background: url('FIELD_IMG') center top / cover no-repeat;
+    filter: brightness(0.62) saturate(0.95) blur(1.5px);
+  }
+  .shade {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 120% 90% at 50% 34%, rgba(0,0,0,0) 40%, rgba(13,10,7,0.5) 80%, rgba(13,10,7,0.9) 100%),
+      linear-gradient(to bottom, rgba(13,10,7,0.25) 0%, rgba(0,0,0,0) 12%, rgba(0,0,0,0) 52%, rgba(13,10,7,0.85) 66%, rgba(13,10,7,1) 74%);
+  }
+  .popup {
+    position: absolute; left: 50%; top: 60px; width: 494px; height: 623px; margin-left: -247px;
+    background: url('POPUP_IMG') center / cover no-repeat;
+    border-radius: 6px;
+    box-shadow: 0 0 0 2px rgba(214,178,94,0.55), 0 18px 50px rgba(0,0,0,0.85), 0 0 60px rgba(232,200,116,0.18);
+  }
+  .frame {
+    position: absolute; inset: 22px;
+    border: 3px solid rgba(214, 178, 94, 0.85);
+    border-radius: 26px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(0,0,0,0.6), inset 0 0 60px rgba(0,0,0,0.35);
+  }
+  .titleblock {
+    position: absolute; left: 0; right: 0; bottom: 58px;
+    text-align: center;
+  }
+  .ornament {
+    color: #d6b25e; font-size: 26px; letter-spacing: 14px;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+    margin-bottom: 6px;
+  }
+  h1 {
+    color: #e8c874;
+    font-size: 84px;
+    white-space: nowrap;
+    font-weight: 600;
+    letter-spacing: 4px;
+    font-variant: small-caps;
+    line-height: 0.98;
+    text-shadow: 0 3px 10px rgba(0,0,0,0.95), 0 0 45px rgba(232, 200, 116, 0.28);
+  }
+  .tagline {
+    margin-top: 18px;
+    color: #f0e4c8;
+    font-size: 38px;
+    font-style: italic;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.95);
+  }
+</style>
+</head>
+<body>
+  <div class="canvas">
+    <div class="field"></div>
+    <div class="shade"></div>
+    <div class="popup"></div>
+    <div class="frame"></div>
+    <div class="titleblock">
+      <div class="ornament">✦ ✦ ✦</div>
+      <h1>Keep Out of Battle</h1>
+      <div class="tagline">Your surgeon and your wife stay safe.</div>
+    </div>
+  </div>
+</body>
+</html>
