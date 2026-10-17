@@ -20,10 +20,9 @@ land stays out at sea too.
 
 ## What "kept out" means
 
-- **Field, siege and naval battles:** the hero is not spawned and not brought in as a reinforcement.
+- **Field, siege and naval battles:** the hero steps out of the line as soon as they spawn (also as a reinforcement) and leaves the field, unhurt, once deployment is over.
 - **Auto-resolve ("Send troops"):** the hero is not among the troops the simulation can wound.
-- **Hideouts, lord's hall, naval raids:** these battles have their own troop selection screen. A hero you
-  pick there by hand goes in anyway; one you don't pick stays out as usual.
+- **Hideouts:** you pick the band yourself there, so a hero you pick goes in.
 - **Nobody else left:** if everyone who could fight is down and only kept-out heroes remain, they fight
   after all (a battle with nobody on your side can't start). The log says so.
 - **Losing:** a kept-out hero is still in your party. If the battle is lost they are captured with it,
@@ -41,17 +40,19 @@ behavior's own key, which the game ignores without the mod.
 
 ## How it works
 
-Every campaign battle, land or naval, and every auto-resolve draws its fighters from
-`MapEventSide._readyTroopsPriorityList`, filled by the private `MapEventSide.MakeReady`. Wounded heroes are
-never put in that list. A Harmony postfix on `MakeReady` takes the kept-out heroes of the main party out
-of it the same way, so the spawn logic (`PartyGroupTroopSupplier`, used by both the land and the War Sails
-spawn logic) never sees them.
+**Fought battles.** Kept-out heroes spawn as usual; `KeepOutMissionLogic` hides them (agent and mount,
+`AgentVisuals.SetVisible(false)`) as soon as they stand on the field, takes their item off the Order of Battle's
+hero lists, and about half a second after deployment has finished books each one as an ordered withdrawal
+(`SetRouted(isOrderRetreat: true)`: back to the party unhurt, never sent in again as a reinforcement) and fades
+them out. Reinforcements are watched the same way. Two lessons from playtesting are behind this shape:
 
-The game's troop model empties the hand-picked `priorTroops` list while `MakeReady` runs, so a prefix
-reads it first and hands it to the postfix; heroes in it are never taken out.
+- A party hero kept out of the spawn list altogether (never spawned) crashed the game natively a few seconds
+  into deployment, every time.
+- Fading an agent out inside `OnDeploymentFinished` is too early: right after it the mission's
+  `OnAfterDeploymentFinished` walks `Mission.Agents` and sets up every agent in native code.
 
-A postfix on the `PartyGroupTroopSupplier` constructor lowers its initial troop count by the number taken
-out, so "troops not supplied yet" stays correct.
+**Auto-resolve.** A Harmony postfix on the private `MapEventSide.MakeReady` takes the kept-out heroes of the main
+party out of `_readyTroopsPriorityList` for simulations only, so the simulation can't wound them.
 
 The Order of Battle button is a UIExtenderEx prefab insert after the `CaptainPool` panel of the
 `OrderOfBattle` movie, with a view-model mixin on the campaign's `SPOrderOfBattleVM`. Ticking a hero there
