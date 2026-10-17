@@ -19,8 +19,7 @@
     <DependedModuleMetadata id="Native" order="LoadBeforeThis" />
     <DependedModuleMetadata id="SandBoxCore" order="LoadBeforeThis" />
     <DependedModuleMetadata id="Sandbox" order="LoadBeforeThis" />
-    <!-- War Sails: optional. Naval battles use the same troop supplier, so nothing naval-specific is
-         patched; loading after it only lets the option land in its storyline encounter menus too. -->
+    <!-- War Sails: optional. Naval battles use the same troop supplier, so nothing naval-specific is patched. -->
     <DependedModuleMetadata id="NavalDLC" order="LoadBeforeThis" optional="true" />
   </DependedModuleMetadatas>
   <SubModules>

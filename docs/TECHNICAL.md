@@ -4,18 +4,19 @@ For Bannerlord v1.4.8, with or without the War Sails DLC.
 
 ## Using it
 
-Every pre-battle menu (field encounter, joining a battle, army battles, siege strategies, naval
-encounters) gets an option **Choose who stays out of battle**. It shows only when your party has heroes
-other than you. It opens a list of those heroes with portraits; the tooltip on each says if they are your
-surgeon, quartermaster, scout, engineer or spouse. Ticked heroes stay out of every battle until unticked.
-The option's label shows how many are kept out, and its tooltip names them.
+On the Order of Battle screen of a land battle, a **Keep out of battle** button sits under the hero pool at
+the top. It opens a list of the heroes in your party with portraits; the tooltip on each says if they are
+your surgeon, quartermaster, scout, engineer or spouse. Heroes already kept out are shown ticked.
+
+Ticking a hero there makes them step out of the line at once (hidden and taken off the hero lists); they
+leave the field, unhurt, when you press Ready. Untick them before Ready and they are back in the line and the
+hero pool. The choice is saved with your campaign: in later battles ticked heroes are never spawned at all.
+Untick them on any Order of Battle screen and they fight again from the next battle.
 
 At the start of a battle a green line in the log names who was kept out.
 
-**On the Order of Battle screen** (land battles) there is also a **Keep out of battle** button under the
-hero pool at the top. It opens the same list. Heroes you tick there step out of the line at once (hidden and
-taken off the hero lists) and leave the field, unhurt, when you press Ready. Untick them before Ready and they
-are back in the line and the hero pool. Either way the choice is remembered for later battles.
+Naval battles (War Sails) use a different Order of Battle screen with no button, but whoever you kept out on
+land stays out at sea too.
 
 ## What "kept out" means
 
@@ -59,7 +60,7 @@ clears their hero item from the Order of Battle's lists (`ClearHeroAssignment`, 
 keeps them pending, and unticking puts the item and the visuals back. At `OnDeploymentFinished` each pending
 agent's origin is booked as an ordered withdrawal (`SetRouted(isOrderRetreat: true)`: back to the party
 unhurt, never sent in again as a reinforcement), then the agent and its mount are faded out.
-The naval Order of Battle is a different screen and has no button; use the encounter menu there.
+The naval Order of Battle is a different screen and has no button; choices made on land apply at sea.
 
 The popup is the game's own multi-selection inquiry. A postfix on `MultiSelectionQueryPopUpVM.SetData`
 ticks the heroes already kept out when *our* popup opens (matched by reference). If that patch fails, the

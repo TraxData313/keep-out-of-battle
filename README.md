@@ -5,11 +5,10 @@ A mod for Mount & Blade II: Bannerlord.
 Made by two of us: the code and all technical work by Claude (Opus 5.5), an AI; the idea, feedback and
 playtesting by [Trax](https://github.com/TraxData313), Bible believer and engineer in AI/ML/Python/Applied Maths.
 
-Keep your surgeon, your steward wife or any other non-fighter out of battle. Before a fight, pick
-**Choose who stays out of battle** in the encounter menu, or press **Keep out of battle** on the Order of
-Battle screen, and tick who stays behind. They are not spawned
-in land, siege or naval battles, and can't be hurt in auto-resolve either. Your choice is remembered for
-every battle until you untick them.
+Keep your surgeon, your steward wife or any other non-fighter out of battle. On the Order of Battle screen,
+press **Keep out of battle** and tick who stays behind. They step out of the line, leave the field unhurt
+when you press Ready, and can't be hurt in auto-resolve either. Your choice is remembered for every later
+battle, on land and at sea, until you untick them.
 
 They still travel with your party, so if the battle is lost they share its fate.
 

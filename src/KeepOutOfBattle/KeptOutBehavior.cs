@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.GameMenus;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.Core;
 using TaleWorlds.Core.ImageIdentifiers;
@@ -12,27 +11,10 @@ using TaleWorlds.ObjectSystem;
 
 namespace KeepOutOfBattle
 {
-    // Remembers which heroes of the player's party stay out of battle, and adds the menu option that opens the
-    // choice before every fight. Saved as hero string ids, so removing the mod leaves nothing behind in the save.
+    // Remembers which heroes of the player's party stay out of battle (chosen on the Order of Battle screen).
+    // Saved as hero string ids, so removing the mod leaves nothing behind in the save.
     internal sealed class KeptOutBehavior : CampaignBehaviorBase
     {
-        private const string OptionId = "keep_out_of_battle";
-
-        // The pre-battle menus of land, siege and naval encounters (War Sails uses "encounter" too; its
-        // storyline has its own). A menu that does not exist in this game is created empty and never shown.
-        private static readonly string[] BattleMenus =
-        {
-            "encounter",
-            "join_encounter",
-            "army_encounter",
-            "encounter_interrupted",
-            "encounter_interrupted_siege_preparations",
-            "menu_siege_strategies",
-            "join_siege_event",
-            "naval_storyline_encounter",
-            "naval_storyline_join_encounter",
-        };
-
         public static KeptOutBehavior? Instance { get; private set; }
 
         private List<string> _keptOutIds = new List<string>();
@@ -51,7 +33,6 @@ namespace KeepOutOfBattle
 
         public override void RegisterEvents()
         {
-            CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener(this, OnSessionLaunched);
         }
 
         public override void SyncData(IDataStore dataStore)
@@ -61,12 +42,6 @@ namespace KeepOutOfBattle
             dataStore.SyncData("KeepOutOfBattle_heroIds", ref _keptOutIds);
             if (dataStore.IsLoading)
                 _keptOut = new HashSet<string>(_keptOutIds ?? new List<string>());
-        }
-
-        private void OnSessionLaunched(CampaignGameStarter starter)
-        {
-            foreach (var menu in BattleMenus)
-                starter.AddGameMenuOption(menu, OptionId, "{=!}{KEEP_OUT_OF_BATTLE_TEXT}", OptionCondition, OptionConsequence, index: 1);
         }
 
         // Heroes of the player's own party who could be sent in: everyone but the player.
@@ -79,31 +54,6 @@ namespace KeepOutOfBattle
                 .Where(e => e.Character != null && e.Character.IsHero && !e.Character.IsPlayerCharacter && e.Character.HeroObject != null)
                 .Select(e => e.Character.HeroObject)
                 .ToList();
-        }
-
-        private bool OptionCondition(MenuCallbackArgs args)
-        {
-            var heroes = PartyHeroes();
-            if (heroes.Count == 0)
-                return false;
-            args.optionLeaveType = GameMenuOption.LeaveType.Manage;
-            int count = heroes.Count(IsKeptOut);
-            string text = count == 0
-                ? "Choose who stays out of battle"
-                : "Choose who stays out of battle (" + count + " kept out)";
-            MBTextManager.SetTextVariable("KEEP_OUT_OF_BATTLE_TEXT", text);
-            args.Tooltip = new TextObject("{=!}" + (count == 0
-                ? "Pick the companions, surgeon or family in your party who should not fight. Remembered for every battle."
-                : "Staying out: " + string.Join(", ", heroes.Where(IsKeptOut).Select(h => h.Name.ToString()))));
-            return true;
-        }
-
-        private void OptionConsequence(MenuCallbackArgs args)
-        {
-            ShowPicker(PartyHeroes(),
-                "Ticked heroes stay behind in this and every later battle, on land and at sea, until you untick them. "
-                + "They still share your party's fate if the battle is lost.",
-                _ => Campaign.Current?.CurrentMenuContext?.Refresh());
         }
 
         // The game's own multi-selection popup over these heroes, the kept-out ones pre-ticked. On "Done" the
