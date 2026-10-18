@@ -1,0 +1,20 @@
+<Tasks>
+    <CreateItem/>
+    <UpdateItem>
+        <!-- First Steam Workshop upload: it CREATED the item (2026-10-18). Never run it again - updates go
+             through tools\make_workshop_update.py (see tools\WORKSHOP-UPLOAD.md). <Tasks> must be the file's
+             first node; comments only inside UpdateItem. Title comes from SubModule.xml <Name>.
+             The short description here is replaced by tools\STEAM-DESCRIPTION.bbcode on the first update. -->
+        <ModuleFolder Value="C:\Users\Asus ROG\Documents\BannerlordMods\keep-out-of-battle\dist\KeepOutOfBattle"/>
+        <ItemDescription Value="Keep your surgeon, steward wife or any non-fighter out of land and naval battles: tick them on the Order of Battle screen. Requires Harmony and UIExtenderEx."/>
+        <Tags>
+            <Tag Value="Utility" />
+            <Tag Value="UI" />
+            <Tag Value="Native" />
+            <Tag Value="Singleplayer" />
+            <Tag Value="v1.4.8" />
+        </Tags>
+        <Image Value="C:\Users\Asus ROG\Documents\BannerlordMods\keep-out-of-battle\docs\thumbnail.jpg"/>
+        <Visibility Value="Public"/>
+    </UpdateItem>
+</Tasks>

@@ -1,0 +1,19 @@
+<Tasks>
+    <GetItem>
+        <!-- Updating the existing Workshop item 3822341932 (created 2026-10-18 by WorkshopCreate.xml).
+             Not run directly: tools\make_workshop_update.py builds a task from it (adds ModuleFolder,
+             the description, change notes, visibility). See tools\WORKSHOP-UPLOAD.md. -->
+        <ItemId Value="3822341932"/>
+    </GetItem>
+    <UpdateItem>
+        <ModuleFolder Value="DIST_FOLDER"/>
+        <ChangeNotes Value="vX.Y.Z - what changed." />
+        <Tags>
+            <Tag Value="Utility" />
+            <Tag Value="UI" />
+            <Tag Value="Native" />
+            <Tag Value="Singleplayer" />
+            <Tag Value="v1.4.8" />
+        </Tags>
+    </UpdateItem>
+</Tasks>
