@@ -19,7 +19,9 @@ watched the battle, rather than fought it.
 
 ## Install
 
-1. Download the zip from the [GitHub Releases page](https://github.com/TraxData313/keep-out-of-battle/releases/latest).
+1. Download the zip from the [GitHub Releases page](https://github.com/TraxData313/keep-out-of-battle/releases/latest),
+   subscribe on the [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3822341932),
+   or get it from [Nexus Mods](https://www.nexusmods.com/mountandblade2bannerlord/mods/14216).
 2. Extract it into `Mount & Blade II Bannerlord\Modules\`.
 3. Enable it in the launcher.
 
