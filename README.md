@@ -11,6 +11,7 @@ Keep your surgeon, your steward wife or any other non-fighter out of battle. On 
 press **Keep out of battle** and tick who stays behind. They step out of the line, leave the field unhurt
 when you press Ready, and can't be hurt in auto-resolve either. Your choice is remembered for every later
 battle, on land and at sea, until you untick them, and the button shows how many are kept out.
+Each hero's portrait in the list shows their health, so you can see at a glance who is wounded.
 
 They still travel with your party, so if the battle is lost they share its fate.
 

@@ -2,7 +2,7 @@
 <Module xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/BUTR/Bannerlord.XmlSchemas/master/SubModule.xsd">
   <Id value="KeepOutOfBattle" />
   <Name value="Keep Out of Battle" />
-  <Version value="v1.1.0" />
+  <Version value="v1.2.0" />
   <DefaultModule value="false" />
   <ModuleCategory value="Singleplayer" />
   <ModuleType value="Community" />
