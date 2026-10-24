@@ -16,6 +16,7 @@ from __future__ import annotations
 import io
 import shutil
 import subprocess
+import time
 from pathlib import Path
 
 from PIL import Image
@@ -44,6 +45,18 @@ def cut(shot: str, box: tuple[int, int, int, int], size: tuple[int, int], name: 
     return out
 
 
+def wait_for_file(path: Path, timeout: float = 60.0) -> None:
+    """Edge can return before its headless screenshot is on disk; wait until it exists and stops growing."""
+    deadline, last = time.monotonic() + timeout, -1
+    while time.monotonic() < deadline:
+        size = path.stat().st_size if path.exists() else -1
+        if size > 0 and size == last:
+            return
+        last = size
+        time.sleep(0.5)
+    raise SystemExit(f"The browser did not write {path}.")
+
+
 def main() -> None:
     WORK.mkdir(parents=True, exist_ok=True)
     field = cut(FIELD_SHOT, FIELD_BOX, (1024, 1024), "field.jpg")
@@ -58,9 +71,11 @@ def main() -> None:
     if not browser:
         raise SystemExit("Edge or Chrome is needed to render the thumbnail.")
     png = WORK / "thumbnail.png"
+    png.unlink(missing_ok=True)  # a stale render must never be mistaken for this one
     subprocess.run([browser, "--headless=new", "--disable-gpu", "--hide-scrollbars", "--force-device-scale-factor=1",
                     "--allow-file-access-from-files", "--window-size=1024,1024", f"--screenshot={png}",
                     page.as_uri()], check=True, capture_output=True, timeout=120)
+    wait_for_file(png)
     img = Image.open(png).convert("RGB").crop((0, 0, 1024, 1024))
 
     for quality in range(95, 60, -3):
