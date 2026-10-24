@@ -49,6 +49,11 @@ Copy-Item (Join-Path $outDir "$moduleName.dll") $binDir -Force
 $pdb = Join-Path $outDir "$moduleName.pdb"
 if (Test-Path $pdb) { Copy-Item $pdb $binDir -Force }
 
+# The GUI files (brushes for the picker's health bars), mirrored so a removed file goes too.
+$guiDir = Join-Path $moduleDir "GUI"
+if (Test-Path $guiDir) { Remove-Item $guiDir -Recurse -Force }
+Copy-Item (Join-Path $repoRoot "module\GUI") $guiDir -Recurse -Force
+
 # The manifest, re-badged as the dev module. Only the FIRST Id/Name (the module's own) change.
 $manifest = Get-Content (Join-Path $repoRoot "module\SubModule.xml") -Raw
 $devManifest = ([regex]"<Id value=""$moduleName"" />").Replace($manifest, "<Id value=""$moduleName.Dev"" />", 1)

@@ -88,6 +88,7 @@ namespace KeepOutOfBattle
                 },
                 negativeAction: null);
 
+            HeroHealthBarMixin.Mark(elements);
             if (canPreselect)
                 PopupPreselectPatch.Expect(data, heroes.Where(IsKeptOut).Cast<object>());
             MBInformationManager.ShowMultiSelectionInquiry(data);
@@ -106,7 +107,9 @@ namespace KeepOutOfBattle
             }
             if (Hero.MainHero?.Spouse == hero) parts.Add("Spouse");
             if (hero.IsWounded) parts.Add("wounded");
-            return parts.Count == 0 ? hero.Name.ToString() : hero.Name + ": " + string.Join(", ", parts);
+            // Also under the portrait as a bar; here too in case that prefab insert failed.
+            parts.Add(HeroHealthBarMixin.HealthPercent(hero) + "% health");
+            return hero.Name + ": " + string.Join(", ", parts);
         }
 
         // Only the heroes shown in the popup change; a kept-out hero who is away from the party stays kept out.

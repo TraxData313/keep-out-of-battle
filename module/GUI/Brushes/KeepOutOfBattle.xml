@@ -1,0 +1,16 @@
+<Brushes>
+  <!-- The party screen's hero health bar fill (Party.TroopTupple.HealthBarFill) on a plain sprite: its own
+       health_bar_fill_9 is in the ui_partyscreen sprite category, which is not loaded on the Order of Battle.
+       PartyHealthFillBarWidget colours the DefaultFill layer itself (red wounded, gold, green from 90%). -->
+  <Brush Name="KeepOutOfBattle.HealthBarFill">
+    <Layers>
+      <BrushLayer Name="EmptyFill" Sprite="BlankWhiteSquare_9" ColorFactor="1" Color="#FFFFFF00" />
+      <BrushLayer Name="DefaultFill" Sprite="BlankWhiteSquare_9" ColorFactor="1" Color="#FFFFFFFF" />
+      <BrushLayer Name="ChangeFill" Sprite="BlankWhiteSquare_9" ColorFactor="1" Color="#FFFFFF00" />
+    </Layers>
+    <Styles>
+      <Style Name="Default">
+      </Style>
+    </Styles>
+  </Brush>
+</Brushes>

@@ -33,6 +33,7 @@ if ($LASTEXITCODE -ne 0) { throw "Build failed." }
 
 New-Item -ItemType Directory -Force $binDir | Out-Null
 Copy-Item (Join-Path $repoRoot "module\SubModule.xml") $moduleDir -Force
+Copy-Item (Join-Path $repoRoot "module\GUI") (Join-Path $moduleDir "GUI") -Recurse -Force
 Copy-Item (Join-Path $repoRoot "module\bin\Win64_Shipping_Client\$moduleName.dll") $binDir -Force
 
 # Zip with forward-slash entry names (PowerShell 5.1's Compress-Archive writes backslashes, which some
